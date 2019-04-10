@@ -1,0 +1,4 @@
+# CRON JOBS
+
+# Laravel task scheduling run as application user
+* * * * * /app/run_command_with_cached_env.sh schedule:run >> /dev/null 2>&1

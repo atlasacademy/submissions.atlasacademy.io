@@ -11,6 +11,8 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+/**
+ * @var $router \Laravel\Lumen\Routing\Router
+ */
+$router->get('/event', "EventController@index");
+$router->get('/event/{uid}', "EventController@get");
