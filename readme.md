@@ -1,21 +1,50 @@
-# Lumen PHP Framework
+# submissions.atlasacademy.io
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://poser.pugx.org/laravel/lumen-framework/d/total.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/lumen-framework/v/stable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/lumen-framework/v/unstable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
+submissions.atlasacademy.io is a API service intended for
+connecting the submissions and drop rate sheets with other
+outside services and devices.
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+### Available Routes
 
-## Official Documentation
+- GET /event
+- GET /event/{uid}
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+### Works in Progress
 
-## Security Vulnerabilities
+__POST /submit/runs__
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+Request fields
+```
+event_uid => string
+node_uid => string
+runs => int
+submitter => string | optional
+drops[#][uid] => string
+drops[#][amount] => int
+```
 
-## License
+__POST /submit/screenshot__
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Request fields
+```
+event_uid => string
+node_uid => string
+submitter => string | optional
+image => file | jpg or png
+```
+
+### Objects
+
+__Event__
+- uid
+- sheet_id
+- name
+- sort
+- submittable - Only events with this boolean will allow submissions. Otherwise it will return an error.
+
+__Node__
+- uid
+- name
+- submissions - Number of submitted runs
+- submitters - Number of distinct submitters
+- sort
