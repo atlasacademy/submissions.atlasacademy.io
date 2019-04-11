@@ -5,6 +5,8 @@ use Google_Service_Sheets;
 
 class SheetClient
 {
+    private $delay = 1;
+    private $lastRequest = null;
 
     /**
      * @var Google_Client
@@ -23,6 +25,8 @@ class SheetClient
      */
     public function getCells(string $sheetId, string $range)
     {
+        $this->throttleRequests();
+
         $response = $this->service()->spreadsheets_values->get($sheetId, $range);
         $results = $response->getValues();
 
@@ -37,6 +41,8 @@ class SheetClient
      */
     public function getCellsRaw(string $sheetId, string $range)
     {
+        $this->throttleRequests();
+
         $response = $this->service()->spreadsheets_values->get($sheetId, $range, [
             "valueRenderOption" => "UNFORMATTED_VALUE",
             "dateTimeRenderOption" => "SERIAL_NUMBER"
@@ -98,6 +104,20 @@ class SheetClient
         $this->sheetService = new Google_Service_Sheets($this->client());
 
         return $this->sheetService;
+    }
+
+    private function throttleRequests()
+    {
+        $now = microtime(true);
+
+        if ($this->lastRequest && $this->lastRequest + $this->delay > $now) {
+            $elapsed = $now - $this->lastRequest;
+            $sleep = round(($this->delay - $elapsed) * 1000000);
+
+            usleep($sleep);
+        }
+
+        $this->lastRequest = $now;
     }
 
 }

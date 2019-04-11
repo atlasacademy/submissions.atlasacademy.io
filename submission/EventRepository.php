@@ -45,7 +45,9 @@ class EventRepository
      */
     public function getEvent(string $uid)
     {
-        $result = $this->connection->table("events")->where("uid", "=", $uid)->first();
+        $result = $this->connection->table("events")
+            ->where("uid", "=", $uid)
+            ->first();
 
         return $result ? (array)$result : null;
     }

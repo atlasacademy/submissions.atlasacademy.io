@@ -39,6 +39,7 @@ class AddEventCommand extends Command
         $submittable = $this->choice('Is event submittable?', ['yes', 'no'], 'yes');
         $position = $this->choice('Add event in what position?', ['first', 'last'], 'first');
 
+        $this->output->text("Creating event ...");
         $event = $this->eventRepository->create(compact(
             "uid",
             "sheet_type",
@@ -47,8 +48,10 @@ class AddEventCommand extends Command
             "node_filter"
         ));
 
+        $this->output->text("Syncing event settings ...");
         $this->dispatcher->dispatchNow(new SyncEventJob($event["uid"]));
 
+        $this->output->text("Activating event ...");
         $this->eventRepository->setActive($event["uid"], true);
         $this->eventRepository->reorderEvents($event["uid"], $position === "first");
         if ($submittable === "yes")

@@ -7,9 +7,6 @@ use Submission\Sheet\SubmissionV4Adapter;
 class SheetManager implements AdapterInterface
 {
 
-    private $delay = 1;
-    private $lastRequest = null;
-
     /**
      * @var AdapterInterface
      */
@@ -37,43 +34,21 @@ class SheetManager implements AdapterInterface
 
     public function setSheetId(string $sheetId)
     {
-        $this->throttleRequests();
-
         return $this->sheetAdapter->setSheetId($sheetId);
     }
 
     public function getNodes($regex)
     {
-        $this->throttleRequests();
-
         return $this->sheetAdapter->getNodes($regex);
     }
 
     public function getNode(string $uid)
     {
-        $this->throttleRequests();
-
         return $this->sheetAdapter->getNode($uid);
     }
 
     public function addSubmission(string $nodeUid, int $runs, $submitter, array $drops)
     {
-        $this->throttleRequests();
-
         return $this->sheetAdapter->addSubmission($nodeUid, $runs, $submitter, $drops);
-    }
-
-    private function throttleRequests()
-    {
-        $now = microtime(true);
-
-        if ($this->lastRequest && $this->lastRequest + $this->delay > $now) {
-            $elapsed = $now - $this->lastRequest;
-            $sleep = round(($this->delay - $elapsed) * 1000000);
-
-            usleep($sleep);
-        }
-
-        $this->lastRequest = $now;
     }
 }

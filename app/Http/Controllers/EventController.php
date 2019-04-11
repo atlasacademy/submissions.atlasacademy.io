@@ -39,7 +39,7 @@ class EventController extends Controller
     public function get(string $uid)
     {
         $event = $this->eventRepository->getEvent($uid);
-        if (!$event)
+        if (!$event || !$event["active"])
             abort(404);
 
         $event["nodes"] = $this->eventNodeRepository->getNodes($uid);

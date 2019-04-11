@@ -3,6 +3,8 @@
 namespace App\Console;
 
 use App\Console\Commands\AddEventCommand;
+use App\Console\Commands\SyncDropsCommand;
+use App\Jobs\SyncDropsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -14,7 +16,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        AddEventCommand::class
+        AddEventCommand::class,
+        SyncDropsCommand::class
     ];
 
     /**
@@ -25,6 +28,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command("submissions:sync_drops")->everyThirtyMinutes();
     }
 }
