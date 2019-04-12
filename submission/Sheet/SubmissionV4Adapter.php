@@ -94,6 +94,23 @@ class SubmissionV4Adapter implements AdapterInterface
         $node["submitters_row"] = $submittersRow;
         $node["submitters"] = $row->get(9, 0);
 
+        $node["drops"] = [];
+        for ($i = $runsRow + 1; $i < $submittersRow; $i++) {
+            $row = Collection::make($sheet[$i]);
+            $dropUid = $row->get(2, null);
+            if (!$dropUid)
+                continue;
+
+            $node["drops"][] = [
+                "uid" => $dropUid,
+                "quantity" => $row->get(8, null) ? $row->get(8, null) : null,
+                "rate" => $row->get(5, null) !== null ? round($row->get(5, 0), 4) : null,
+                "apd" => $row->get(6, null) !== null ? round($row->get(6, 0), 4) : null,
+                "count" => $row->get(9, null) ? $row->get(9, null) : null,
+                "submissions" => $row->get(4, 0) ? $row->get(4, 0) : null,
+            ];
+        }
+
         return $node;
     }
 

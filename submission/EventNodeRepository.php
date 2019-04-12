@@ -99,7 +99,7 @@ class EventNodeRepository
             ->where("uid", "=", $uid)
             ->update($filteredData);
 
-        return $this->getNode($eventUid, $data["uid"]);
+        return $this->getNode($eventUid, $uid);
     }
 
     private function castResultsToArray(Collection $results): array
