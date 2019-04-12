@@ -124,6 +124,24 @@ class DropRepository
     }
 
     /**
+     * @param array $uids
+     * @return array
+     */
+    public function getDropsWithUids(array $uids)
+    {
+        if (!count($uids))
+            return [];
+
+        $results = $this->connection->table("drops")
+            ->where("active", "=", true)
+            ->whereIn("uid", $uids)
+            ->orderBy("sort", "ASC")
+            ->get();
+
+        return $this->castResultsToArray($results);
+    }
+
+    /**
      * @param string $uid
      * @return array|null
      */

@@ -84,6 +84,27 @@ class EventNodeDropRepository
 
     /**
      * @param string $eventUid
+     * @param array $eventNodeUids
+     * @return array
+     */
+    public function getDropsForNodes(string $eventUid, array $eventNodeUids)
+    {
+        if (!count($eventNodeUids))
+            return [];
+
+        $results = $this->connection->table("event_node_drops")
+            ->where("event_uid", "=", $eventUid)
+            ->whereIn("event_node_uid", $eventNodeUids)
+            ->orderBy("event_node_uid", "ASC")
+            ->orderBy("sort", "ASC")
+            ->orderBy("uid", "ASC")
+            ->get();
+
+        return $this->castResultsToArray($results);
+    }
+
+    /**
+     * @param string $eventUid
      * @param string $eventNodeUid
      * @param string $uid
      * @param array $data
