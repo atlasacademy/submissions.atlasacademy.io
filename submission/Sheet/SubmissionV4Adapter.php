@@ -56,7 +56,7 @@ class SubmissionV4Adapter implements AdapterInterface
         $nodes = $this->getNodesRaw();
         $node = Collection::make($nodes)
             ->filter(function ($node) use ($uid) {
-                return $node["uid"] === $uid;
+                return ((string)$node["uid"]) === $uid;
             })
             ->first();
 

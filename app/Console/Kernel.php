@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\AddEventCommand;
 use App\Console\Commands\SyncDropsCommand;
+use App\Console\Commands\UpdateEventCommand;
 use App\Jobs\SyncDropsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
@@ -17,7 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         AddEventCommand::class,
-        SyncDropsCommand::class
+        SyncDropsCommand::class,
+        UpdateEventCommand::class
     ];
 
     /**
