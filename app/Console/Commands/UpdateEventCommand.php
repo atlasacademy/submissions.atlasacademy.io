@@ -37,14 +37,9 @@ class UpdateEventCommand extends Command
         }
 
         $name = $this->ask('Input event name', $event["name"]);
-        $submittable = $this->choice('Is event submittable?', ['yes', 'no'], 'yes');
+        $active = $this->choice('Set event active?', ['yes', 'no'], $event["active"] ? "yes" : "no");
+        $submittable = $this->choice('Set event submittable?', ['yes', 'no'], $event["submittable"] ? "yes" : "no");
         $position = $this->choice('Move event to what position?', ['first', 'last'], 'first');
-
-        $event = $this->eventRepository->getEvent($uid);
-        if (!$event) {
-            $this->output->text("Event not found.");
-            return;
-        }
 
         $this->output->text("Updating event ...");
         $event = $this->eventRepository->update($uid, compact("name"));
@@ -53,10 +48,9 @@ class UpdateEventCommand extends Command
         $this->dispatcher->dispatchNow(new SyncEventJob($event["uid"]));
 
         $this->output->text("Activating event ...");
-        $this->eventRepository->setActive($event["uid"], true);
+        $this->eventRepository->setActive($event["uid"], $active === "yes");
         $this->eventRepository->reorderEvents($event["uid"], $position === "first");
-        if ($submittable === "yes")
-            $this->eventRepository->setSubmittable($event["uid"], true);
+        $this->eventRepository->setSubmittable($event["uid"], $submittable === "yes");
     }
 
 }
