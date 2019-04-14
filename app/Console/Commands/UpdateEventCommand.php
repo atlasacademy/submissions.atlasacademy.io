@@ -39,7 +39,7 @@ class UpdateEventCommand extends Command
         $name = $this->ask('Input event name', $event["name"]);
         $active = $this->choice('Set event active?', ['yes', 'no'], $event["active"] ? "yes" : "no");
         $submittable = $this->choice('Set event submittable?', ['yes', 'no'], $event["submittable"] ? "yes" : "no");
-        $position = $this->choice('Move event to what position?', ['first', 'last'], 'first');
+        $position = $this->choice('Move event to what position?', ['none', 'first', 'last'], 'none');
 
         $this->output->text("Updating event ...");
         $event = $this->eventRepository->update($uid, compact("name"));
@@ -49,7 +49,10 @@ class UpdateEventCommand extends Command
 
         $this->output->text("Activating event ...");
         $this->eventRepository->setActive($event["uid"], $active === "yes");
-        $this->eventRepository->reorderEvents($event["uid"], $position === "first");
+
+        if ($position !== "none")
+            $this->eventRepository->reorderEvents($event["uid"], $position === "first");
+
         $this->eventRepository->setSubmittable($event["uid"], $submittable === "yes");
     }
 

@@ -31,21 +31,23 @@ class EventNodeDropRepository
 
         $this->connection->table("event_node_drops")->insert($filteredData);
 
-        return $this->getDrop($eventUid, $eventNodeUid, $data["uid"]);
+        return $this->getDrop($eventUid, $eventNodeUid, $data["uid"], $data["quantity"]);
     }
 
     /**
      * @param string $eventUid
      * @param string $eventNodeUid
      * @param string $uid
+     * @param string $quantity
      * @return bool
      */
-    public function delete(string $eventUid, string $eventNodeUid, string $uid)
+    public function delete(string $eventUid, string $eventNodeUid, string $uid, string $quantity)
     {
         return (bool)$this->connection->table("event_node_drops")
             ->where("event_uid", "=", $eventUid)
             ->where("event_node_uid", "=", $eventNodeUid)
             ->where("uid", "=", $uid)
+            ->where("quantity", "=", $quantity)
             ->delete();
     }
 
@@ -53,14 +55,16 @@ class EventNodeDropRepository
      * @param string $eventUid
      * @param string $eventNodeUid
      * @param string $uid
+     * @param int $quantity
      * @return array|null
      */
-    public function getDrop(string $eventUid, string $eventNodeUid, string $uid)
+    public function getDrop(string $eventUid, string $eventNodeUid, $uid, $quantity)
     {
         $drop = $this->connection->table("event_node_drops")
             ->where("event_uid", "=", $eventUid)
             ->where("event_node_uid", "=", $eventNodeUid)
             ->where("uid", "=", $uid)
+            ->where("quantity", "=", $quantity)
             ->first();
 
         return $drop ? (array)$drop : null;
@@ -107,12 +111,13 @@ class EventNodeDropRepository
      * @param string $eventUid
      * @param string $eventNodeUid
      * @param string $uid
+     * @param int $quantity
      * @param array $data
      * @return array|null
      */
-    public function update(string $eventUid, string $eventNodeUid, string $uid, array $data)
+    public function update(string $eventUid, string $eventNodeUid, string $uid, int $quantity, array $data)
     {
-        $allowedKeys = ["quantity", "rate", "apd", "count", "submissions", "sort"];
+        $allowedKeys = ["count", "rate", "apd", "submissions", "sort"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["updated_at"] = Carbon::now();
@@ -121,9 +126,10 @@ class EventNodeDropRepository
             ->where("event_uid", "=", $eventUid)
             ->where("event_node_uid", "=", $eventNodeUid)
             ->where("uid", "=", $uid)
+            ->where("quantity", "=", $quantity)
             ->update($filteredData);
 
-        return $this->getDrop($eventUid, $eventNodeUid, $uid);
+        return $this->getDrop($eventUid, $eventNodeUid, $uid, $quantity);
     }
 
     private function castResultsToArray(Collection $results): array

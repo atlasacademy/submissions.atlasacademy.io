@@ -10,6 +10,7 @@ ENV WEB_DOCUMENT_ROOT=/app/public \
     DB_DATABASE=submissions \
     DB_USERNAME=root \
     DB_PASSWORD=password \
+    LOG_CHANNEL=syslog \
     QUEUE_CONNECTION=database \
     QUEUE_TABLE=jobs
 

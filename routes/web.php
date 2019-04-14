@@ -16,3 +16,5 @@
  */
 $router->get('/event', "EventController@index");
 $router->get('/event/{uid}', "EventController@get");
+
+$router->post('/submit/run', "SubmitRunController@post");

@@ -87,25 +87,47 @@ class SyncEventJob extends Job
     {
         $currentDrops = $this->eventNodeDropRepository->getDrops($this->eventUid, $newNode["uid"]);
         $newDrops = $newNode["drops"];
-        $newDropUids = Arr::pluck($newDrops, "uid");
+        $newDropUids = array_map(function ($newDrop) {
+            return $newDrop["uid"] . "_" . $newDrop["quantity"];
+        }, $newDrops);
 
         foreach ($newDrops as $k => $newDrop) {
             $newDrop["sort"] = $k;
 
-            $currentDrop = $this->eventNodeDropRepository->getDrop($this->eventUid, $newNode["uid"], $newDrop["uid"]);
+            $currentDrop = $this->eventNodeDropRepository->getDrop(
+                $this->eventUid,
+                $newNode["uid"],
+                $newDrop["uid"],
+                $newDrop["quantity"]
+            );
 
             if ($currentDrop) {
-                $this->eventNodeDropRepository->update($this->eventUid, $newNode["uid"], $newDrop["uid"], $newDrop);
+                $this->eventNodeDropRepository->update(
+                    $this->eventUid,
+                    $newNode["uid"],
+                    $newDrop["uid"],
+                    $newDrop["quantity"],
+                    $newDrop
+                );
             } else {
-                $this->eventNodeDropRepository->create($this->eventUid, $newNode["uid"], $newDrop);
+                $this->eventNodeDropRepository->create(
+                    $this->eventUid,
+                    $newNode["uid"],
+                    $newDrop
+                );
             }
         }
 
         foreach ($currentDrops as $currentDrop) {
-            if (in_array($currentDrop["uid"], $newDropUids))
+            if (in_array($currentDrop["uid"] . "_" . $currentDrop["quantity"], $newDropUids))
                 continue;
 
-            $this->eventNodeDropRepository->delete($this->eventUid, $newNode["uid"], $currentDrop["uid"]);
+            $this->eventNodeDropRepository->delete(
+                $this->eventUid,
+                $newNode["uid"],
+                $currentDrop["uid"],
+                $currentDrop["quantity"]
+            );
         }
     }
 

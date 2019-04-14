@@ -51,11 +51,22 @@ class Handler extends ExceptionHandler
                 "code" => 404,
                 "message" => "Endpoint not found."
             ], 404);
+        } else if ($exception instanceof ValidationException) {
+            return response()->json([
+                "code" => 422,
+                "message" => "Missing or invalid parameters.",
+                "errors" => $exception->validator->getMessageBag()->all()
+            ], 422);
         } else if ($exception instanceof HttpException) {
             return response()->json([
                 "code" => $exception->getStatusCode(),
                 "message" => $exception->getMessage()
             ], $exception->getStatusCode());
+        } else {
+            return response()->json([
+                "code" => 500,
+                "message" => "Unexpected error."
+            ], 500);
         }
     }
 }

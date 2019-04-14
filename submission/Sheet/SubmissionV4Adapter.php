@@ -102,12 +102,12 @@ class SubmissionV4Adapter implements AdapterInterface
                 continue;
 
             $node["drops"][] = [
-                "uid" => $dropUid,
-                "quantity" => $row->get(8, null) ? $row->get(8, null) : null,
-                "rate" => $row->get(5, null) !== null ? round($row->get(5, 0), 4) : null,
-                "apd" => $row->get(6, null) !== null ? round($row->get(6, 0), 4) : null,
-                "count" => $row->get(9, null) ? $row->get(9, null) : null,
-                "submissions" => $row->get(4, 0) ? $row->get(4, 0) : null,
+                "uid" => strtoupper($dropUid),
+                "quantity" => $row->get(8) ? $row->get(8) : 1,
+                "rate" => $row->get(5) !== null ? round($row->get(5, 0), 4) : null,
+                "apd" => $row->get(6) !== null ? round($row->get(6, 0), 4) : null,
+                "count" => $row->get(9, null),
+                "submissions" => $row->get(4),
             ];
         }
 
@@ -136,7 +136,7 @@ class SubmissionV4Adapter implements AdapterInterface
                     $name .= " (" . trim($row[3]) . ")";
 
                 return [
-                    "uid" => $row[0],
+                    "uid" => strtoupper($row[0]),
                     "name" => $name,
                     "ap" => $row[4],
                     "sheet_name" => $row[7]
