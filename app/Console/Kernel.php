@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\AddEventCommand;
 use App\Console\Commands\SyncDropsCommand;
+use App\Console\Commands\TestCommand;
 use App\Console\Commands\UpdateEventCommand;
 use App\Jobs\SyncActiveEventsJob;
 use App\Jobs\SyncDropsJob;
@@ -20,7 +21,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         AddEventCommand::class,
         SyncDropsCommand::class,
-        UpdateEventCommand::class
+        UpdateEventCommand::class,
+        TestCommand::class,
     ];
 
     /**

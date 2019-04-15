@@ -46,4 +46,32 @@ class SubmissionRepository
         return $receipt;
     }
 
+    /**
+     * @param string $receipt
+     * @return array|null
+     */
+    public function getSubmission(string $receipt)
+    {
+        $result = $this->connection->table("submissions")
+            ->where("receipt", "=", $receipt)
+            ->first();
+
+        return $result ? (array)$result : null;
+    }
+
+    /**
+     * @param string $receipt
+     * @param bool $uploaded
+     * @return bool
+     */
+    public function setUploaded(string $receipt, bool $uploaded)
+    {
+        return $this->connection->table("submissions")
+            ->where("receipt", "=", $receipt)
+            ->update([
+                "uploaded" => boolval($uploaded),
+                "updated_at" => Carbon::now()
+            ]);
+    }
+
 }

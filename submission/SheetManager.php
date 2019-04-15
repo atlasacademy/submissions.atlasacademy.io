@@ -47,8 +47,8 @@ class SheetManager implements AdapterInterface
         return $this->sheetAdapter->getNode($uid);
     }
 
-    public function addSubmission(string $nodeUid, int $runs, $submitter, array $drops)
+    public function addSubmission(string $nodeUid, $submitter, array $drops)
     {
-        return $this->sheetAdapter->addSubmission($nodeUid, $runs, $submitter, $drops);
+        return $this->sheetAdapter->addSubmission($nodeUid, $submitter, $drops);
     }
 }

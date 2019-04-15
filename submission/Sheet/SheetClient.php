@@ -2,6 +2,8 @@
 
 use Google_Client;
 use Google_Service_Sheets;
+use Google_Service_Sheets_ValueRange;
+use Illuminate\Support\Arr;
 
 class SheetClient
 {
@@ -50,6 +52,24 @@ class SheetClient
         $results = $response->getValues();
 
         return $results;
+    }
+
+    public function updateCells(string $sheetId, string $range, array $values)
+    {
+        $this->throttleRequests();
+
+        $values = $this->formatNullValues($values);
+
+        $requestBody = new Google_Service_Sheets_ValueRange();
+        $requestBody->setMajorDimension("ROWS");
+        $requestBody->setRange($range);
+        $requestBody->setValues($values);
+        $options = [
+            "valueInputOption" => "RAW"
+        ];
+        $this->service()->spreadsheets_values->update($sheetId, $range, $requestBody, $options);
+
+        return true;
     }
 
     /**
@@ -118,6 +138,19 @@ class SheetClient
         }
 
         $this->lastRequest = $now;
+    }
+
+    private function formatNullValues(array $values)
+    {
+        return array_map(function ($value) {
+            if ($value === null)
+                return Google_Service_Sheets_ValueRange::NULL_VALUE;
+
+            if (is_array($value))
+                return $this->formatNullValues($value);
+
+            return $value;
+        }, $values);
     }
 
 }
