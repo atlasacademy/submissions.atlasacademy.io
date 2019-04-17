@@ -82,10 +82,10 @@ class DropRepository
 
         $extension = $type === 0 ? "jpg" : "png";
         $client->request("GET", $drop["image_original"], [
-            "sink" => base_path("/public/assets/drops/{$uid}.{$extension}")
+            "sink" => env("ASSETS_DIRECTORY") . "/drops/{$uid}.{$extension}"
         ]);
 
-        $image = url("/assets/drops/{$uid}.{$extension}");
+        $image = env("ASSETS_HOST") . "/drops/{$uid}.{$extension}";
 
         $this->connection->table("drops")
             ->where("uid", "=", $uid)
@@ -147,8 +147,8 @@ class DropRepository
      */
     public function removeImage(string $uid)
     {
-        $jpgPath = base_path("/public/assets/drops/{$uid}.png");
-        $pngPath = base_path("/public/assets/drops/{$uid}.png");
+        $jpgPath = env("ASSETS_DIRECTORY") . "/drops/{$uid}.jpg";
+        $pngPath = env("ASSETS_DIRECTORY") . "/drops/{$uid}.png";
 
         if ($this->filesystem->exists($pngPath))
             $this->filesystem->delete($pngPath);

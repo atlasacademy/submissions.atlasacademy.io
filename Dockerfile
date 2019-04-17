@@ -2,8 +2,8 @@ FROM webdevops/php-nginx:7.3
 MAINTAINER sadisticsolutione@gmail.com
 
 ENV WEB_DOCUMENT_ROOT=/app/public \
-    APP_NAME=submissions.atlas-academy.io \
-    APP_URL=https://submissions.atlas-academy.io \
+    APP_NAME=submissions.atlasacademy.io \
+    APP_URL=http://submissions.test.atlasacademy.io \
     DB_CONNECTION=mysql \
     DB_HOST=db \
     DB_PORT=3306 \
@@ -12,7 +12,9 @@ ENV WEB_DOCUMENT_ROOT=/app/public \
     DB_PASSWORD=password \
     LOG_CHANNEL=syslog \
     QUEUE_CONNECTION=database \
-    QUEUE_TABLE=jobs
+    QUEUE_TABLE=jobs \
+    ASSETS_HOST=http://submissions.test.atlasacademy.io/assets \
+    ASSETS_DIRECTORY=/app/public/assets
 
 WORKDIR /app
 
