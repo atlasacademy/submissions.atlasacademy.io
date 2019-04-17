@@ -83,7 +83,6 @@ class SubmitRunController extends Controller
         }
 
         // Ensure drops are passed as an array
-        $cleanDrops = [];
         $drops = $this->request->get("drops");
         if (!$drops || !is_array($drops)) {
             throw new HttpException(422, "Drops field is required and must be an array.");
@@ -95,6 +94,7 @@ class SubmitRunController extends Controller
             return $nodeDrop["uid"] . "_" . $nodeDrop["quantity"];
         }, $nodeDrops);
 
+        $cleanDrops = [];
         foreach ($drops as $k => $drop) {
             // Extract drop data
             $uid = strtoupper(Arr::get($drop, "uid"));
@@ -104,10 +104,7 @@ class SubmitRunController extends Controller
             $ignored = Arr::get($drop, "ignored");
             $uidQuantity = $uid . "_" . $quantity;
 
-            $eventNodeDrop = $this->eventNodeDropRepository->getDrop($event_uid, $event_node_uid, $uid, $quantity);
-            if (!$eventNodeDrop) { // Validate drop + quantity exists for this node
-                throw new HttpException(422, "Invalid drop uid + quantity combination on field drops[{$k}].");
-            } else if ($countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
+            if ($countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!is_int($count) && !$ignored) { // Validate either ignored or count is passed
                 throw new HttpException(422, "Either count or ignored must be provided on field drops[{$k}].");
@@ -126,10 +123,8 @@ class SubmitRunController extends Controller
             $cleanDrops[] = Arr::only($drop, ["uid", "quantity", "count", "ignored"]);
         }
 
-        // If there are still remaining drop + quantity left, user did not submit all required drops
-        if (count($nodeDropUidQuantity)) {
-            throw new HttpException(422, "Not all drops required were submitted.");
-        }
+        // Check if user missed any drops that were expected. Report back to user
+        $containsAllExpectedDrops = count($nodeDropUidQuantity) === 0;
 
         // Generate receipt
         $receipt = $this->submissionRepository->create(
@@ -145,7 +140,8 @@ class SubmitRunController extends Controller
         // Generate response
         return $this->responseFactory->json([
             "status" => "Success",
-            "receipt" => $receipt
+            "receipt" => $receipt,
+            "missing_drops" => !$containsAllExpectedDrops
         ]);
     }
 
