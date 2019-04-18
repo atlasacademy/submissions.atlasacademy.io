@@ -34,6 +34,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command("submissions:sync_drops")->everyThirtyMinutes();
-        $schedule->job(SyncActiveEventsJob::class)->everyThirtyMinutes();
+        $schedule->job(new SyncActiveEventsJob())->everyThirtyMinutes();
     }
 }
