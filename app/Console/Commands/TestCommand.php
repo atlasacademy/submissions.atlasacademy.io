@@ -28,7 +28,7 @@ class TestCommand extends Command
 
     public function handle()
     {
-        $this->dispatcher->dispatchNow(new ExportSubmissionJob("17212afa-5f2b-11e9-b4bb-0242ac110005"));
+        $this->dispatcher->dispatchNow(new ExportSubmissionJob("6744dc76-6277-11e9-a772-0242ac110006"));
     }
 
 }

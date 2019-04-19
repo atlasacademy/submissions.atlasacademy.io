@@ -119,8 +119,14 @@ class SubmitRunController extends Controller
                 return $value !== $uidQuantity;
             });
 
-            // After drop is valid, add only relevant keys
-            $cleanDrops[] = Arr::only($drop, ["uid", "quantity", "count", "ignored"]);
+            // Cast fields as the appropriate types
+            $cleanDrop = [];
+            $cleanDrop["uid"] = $uid;
+            $cleanDrop["quantity"] = intval($quantity);
+            $cleanDrop["count"] = $count;
+            $cleanDrop["ignored"] = boolval($ignored);
+
+            $cleanDrops[] = $cleanDrop;
         }
 
         // Check if user missed any drops that were expected. Report back to user
