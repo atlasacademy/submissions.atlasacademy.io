@@ -14,6 +14,7 @@
 /**
  * @var $router \Laravel\Lumen\Routing\Router
  */
+$router->get('/admin/sync_events', "AdminController@syncEvents");
 $router->get('/event', "EventController@index");
 $router->get('/event/{uid}', "EventController@get");
 

@@ -13,6 +13,7 @@ ENV WEB_DOCUMENT_ROOT=/app/public \
     LOG_CHANNEL=syslog \
     QUEUE_CONNECTION=database \
     QUEUE_TABLE=jobs \
+    ADMIN_KEY=00000000000000000000000000000000 \
     ASSETS_HOST=http://submissions.test.atlasacademy.io/assets \
     ASSETS_DIRECTORY=/app/public/assets
 
