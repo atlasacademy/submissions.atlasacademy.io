@@ -96,10 +96,19 @@ class SyncDropsCommand extends Command
                     && $row[4];
             })
             ->map(function ($row) use ($event) {
+                $uid = $row[0];
+                $name = $row[1];
+                $type = "Material";
+
+                if (preg_match('/\\[Bonus Rate-up\\]$/', $name))
+                    $type = "Bonus Rate-Up";
+                else if ($uid == "QP00" || preg_match('/^Q[0-9]+$/', $uid))
+                    $type = "QP";
+
                 return [
-                    "uid" => $row[0],
-                    "name" => $row[1],
-                    "type" => $row[4],
+                    "uid" => $uid,
+                    "name" => $name,
+                    "type" => $type,
                     "quantity" => $row[5] ? $row[5] : null,
                     "image_original" => array_key_exists(6, $row) ? $row[6] : null,
                     "event" => $event
