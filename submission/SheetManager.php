@@ -8,6 +8,10 @@ class SheetManager implements AdapterInterface
 {
 
     /**
+     * @var DropRepository
+     */
+    private $dropRepository;
+    /**
      * @var AdapterInterface
      */
     private $sheetAdapter = null;
@@ -16,8 +20,10 @@ class SheetManager implements AdapterInterface
      */
     private $sheetClient;
 
-    public function __construct(SheetClient $sheetClient)
+    public function __construct(DropRepository $dropRepository,
+                                SheetClient $sheetClient)
     {
+        $this->dropRepository = $dropRepository;
         $this->sheetClient = $sheetClient;
     }
 
@@ -25,7 +31,7 @@ class SheetManager implements AdapterInterface
     {
         switch ($sheetType) {
             case "submissionsV4":
-                $this->sheetAdapter = new SubmissionV4Adapter($this->sheetClient);
+                $this->sheetAdapter = new SubmissionV4Adapter($this->dropRepository, $this->sheetClient);
                 return;
         }
 

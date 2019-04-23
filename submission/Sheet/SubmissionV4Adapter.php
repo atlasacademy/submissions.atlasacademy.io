@@ -2,10 +2,15 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Submission\DropRepository;
 
 class SubmissionV4Adapter implements AdapterInterface
 {
 
+    /**
+     * @var DropRepository
+     */
+    private $dropRepository;
     /**
      * @var SheetClient
      */
@@ -13,8 +18,10 @@ class SubmissionV4Adapter implements AdapterInterface
     private $cache = [];
     private $sheetId;
 
-    public function __construct(SheetClient $sheetClient)
+    public function __construct(DropRepository $dropRepository,
+                                SheetClient $sheetClient)
     {
+        $this->dropRepository = $dropRepository;
         $this->sheetClient = $sheetClient;
     }
 
@@ -212,10 +219,18 @@ class SubmissionV4Adapter implements AdapterInterface
                 continue;
             }
 
-            $originalValue = intval(Arr::get($extractedColumn, $k, 0));
-            $resultingValue = $originalValue + $mappedDrop["count"];
+            // Check drop setting for bonus type
+            $dropSetting = $this->dropRepository->getDrop($mappedDrop["uid"]);
+            $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
 
-            $data[$k] = $resultingValue;
+            if ($isBonus) {
+                $data[$k] = $mappedDrop["count"];
+            } else {
+                $originalValue = intval(Arr::get($extractedColumn, $k, 0));
+                $resultingValue = $originalValue + $mappedDrop["count"];
+
+                $data[$k] = $resultingValue;
+            }
         }
 
         // Set submitter
@@ -326,6 +341,20 @@ class SubmissionV4Adapter implements AdapterInterface
 
             // If not ignored, but value is omitted, submission does not match
             if (!$isIgnored && $value === null)
+                return false;
+
+            // Get drop setting in order to check drop type
+            $uid = $mappedDrop["uid"];
+            $count = $mappedDrop["count"];
+            $dropSetting = $this->dropRepository->getDrop($uid);
+
+            // If not Bonus Rate-Up, skip
+            if (!$dropSetting || $dropSetting["type"] !== "Bonus Rate-Up")
+                continue;
+
+            // Bonus Rate-Ups are handled differently, they don't append but rather group all submissions
+            // of the same type together. If the bonus doesn't match the value passed, column doesn't match.
+            if ($value !== $count)
                 return false;
         }
 

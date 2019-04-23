@@ -5,6 +5,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Laravel\Lumen\Http\ResponseFactory;
+use Submission\DropRepository;
 use Submission\EventNodeDropRepository;
 use Submission\EventNodeRepository;
 use Submission\EventRepository;
@@ -18,6 +19,10 @@ class SubmitRunController extends Controller
      * @var Dispatcher
      */
     private $dispatcher;
+    /**
+     * @var DropRepository
+     */
+    private $dropRepository;
     /**
      * @var EventRepository
      */
@@ -44,6 +49,7 @@ class SubmitRunController extends Controller
     private $submissionRepository;
 
     public function __construct(Dispatcher $dispatcher,
+                                DropRepository $dropRepository,
                                 EventRepository $eventRepository,
                                 EventNodeRepository $eventNodeRepository,
                                 EventNodeDropRepository $eventNodeDropRepository,
@@ -52,6 +58,7 @@ class SubmitRunController extends Controller
                                 SubmissionRepository $submissionRepository)
     {
         $this->dispatcher = $dispatcher;
+        $this->dropRepository = $dropRepository;
         $this->eventRepository = $eventRepository;
         $this->eventNodeRepository = $eventNodeRepository;
         $this->eventNodeDropRepository = $eventNodeDropRepository;
@@ -104,6 +111,9 @@ class SubmitRunController extends Controller
             $ignored = Arr::get($drop, "ignored");
             $uidQuantity = $uid . "_" . $quantity;
 
+            $dropSetting = $this->dropRepository->getDrop($uid);
+            $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
+
             if ($countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!is_int($count) && !$ignored) { // Validate either ignored or count is passed
@@ -112,6 +122,8 @@ class SubmitRunController extends Controller
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!in_array($uidQuantity, $nodeDropUidQuantity)) { // Validate the same drop + quantity wasn't passed twice
                 throw new HttpException(422, "Duplicate uid and quantity on field drops[{$k}].");
+            } else if ($isBonus && ($count > 100 || $count % 10 > 0)) { // Validate bonus type isn't over 100 and bonus is a multiple of 10
+                throw new HttpException(422, "Invalid bonus amount on field drops[{$k}].");
             }
 
             // Remove drop + quantity combination. This is used to check the same drop + quantity wasn't passed twice
@@ -131,6 +143,17 @@ class SubmitRunController extends Controller
 
         // Check if user missed any drops that were expected. Report back to user
         $containsAllExpectedDrops = count($nodeDropUidQuantity) === 0;
+
+        // Check missed drops to ensure none of them are bonus types
+        foreach ($nodeDropUidQuantity as $uidQuantity) {
+            list($uid) = explode("_", $uidQuantity);
+            $dropSetting = $this->dropRepository->getDrop($uid);
+            $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
+
+            if ($isBonus) {
+                throw new HttpException(422, "All bonus drop data is required for submissions.");
+            }
+        }
 
         // Generate receipt
         $receipt = $this->submissionRepository->create(
