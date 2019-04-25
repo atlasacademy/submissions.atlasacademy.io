@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command("submissions:sync_drops")->everyThirtyMinutes();
-        $schedule->job(new SyncActiveEventsJob())->everyThirtyMinutes();
+        $schedule->command("submissions:sync_drops")->hourly();
+        $schedule->job(new SyncActiveEventsJob())->hourly();
     }
 }

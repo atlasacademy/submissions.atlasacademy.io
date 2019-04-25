@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 
 class SheetClient
 {
-    private $delay = 1;
+    private $delay = 2;
     private $lastRequest = null;
 
     /**
@@ -130,7 +130,9 @@ class SheetClient
     {
         $now = microtime(true);
 
-        if ($this->lastRequest && $this->lastRequest + $this->delay > $now) {
+        if (!$this->lastRequest) {
+            sleep($this->delay);
+        } else if ($this->lastRequest + $this->delay > $now) {
             $elapsed = $now - $this->lastRequest;
             $sleep = round(($this->delay - $elapsed) * 1000000);
 
