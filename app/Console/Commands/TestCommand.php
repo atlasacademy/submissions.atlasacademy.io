@@ -1,6 +1,7 @@
 <?php namespace App\Console\Commands;
 
 use App\Jobs\ExportSubmissionJob;
+use App\Jobs\SyncEventJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Submission\Sheet\SheetClient;
 
@@ -28,7 +29,7 @@ class TestCommand extends Command
 
     public function handle()
     {
-        $this->dispatcher->dispatchNow(new ExportSubmissionJob("d8925e42-6585-11e9-a10b-0242ac110006"));
+        $this->dispatcher->dispatchNow(new SyncEventJob("20190423"));
     }
 
 }

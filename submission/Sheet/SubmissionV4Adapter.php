@@ -115,7 +115,7 @@ class SubmissionV4Adapter implements AdapterInterface
                 "quantity" => $row->get(8) ? $row->get(8) : 1,
                 "rate" => $row->get(5) !== null ? round($row->get(5, 0), 4) : null,
                 "apd" => $row->get(6) !== null ? round($row->get(6, 0), 4) : null,
-                "count" => $row->get(9, null),
+                "count" => intval($row->get(9, null)),
                 "submissions" => $row->get(4),
                 "row" => $i + 1
             ];
