@@ -29,7 +29,12 @@ class SheetClient
     {
         $this->throttleRequests();
 
-        $response = $this->service()->spreadsheets_values->get($sheetId, $range);
+        try {
+            $response = $this->service()->spreadsheets_values->get($sheetId, $range);
+        } catch (\Google_Service_Exception $e) {
+            throw new \Exception("SheetClient->getCells({$sheetId}, {$range})", 0, $e);
+        }
+
         $results = $response->getValues();
 
         return $results;
@@ -45,10 +50,15 @@ class SheetClient
     {
         $this->throttleRequests();
 
-        $response = $this->service()->spreadsheets_values->get($sheetId, $range, [
-            "valueRenderOption" => "UNFORMATTED_VALUE",
-            "dateTimeRenderOption" => "SERIAL_NUMBER"
-        ]);
+        try {
+            $response = $this->service()->spreadsheets_values->get($sheetId, $range, [
+                "valueRenderOption" => "UNFORMATTED_VALUE",
+                "dateTimeRenderOption" => "SERIAL_NUMBER"
+            ]);
+        } catch (\Google_Service_Exception $e) {
+            throw new \Exception("SheetClient->getCellsRaw({$sheetId}, {$range})", 0, $e);
+        }
+
         $results = $response->getValues();
 
         return $results;
@@ -67,7 +77,13 @@ class SheetClient
         $options = [
             "valueInputOption" => "RAW"
         ];
-        $this->service()->spreadsheets_values->update($sheetId, $range, $requestBody, $options);
+
+        try {
+            $this->service()->spreadsheets_values->update($sheetId, $range, $requestBody, $options);
+        } catch (\Google_Service_Exception $e) {
+            $message = "SheetClient->updateCells({$sheetId}, {$range}, " . json_encode($values) . ")";
+            throw new \Exception($message, 0, $e);
+        }
 
         return true;
     }
