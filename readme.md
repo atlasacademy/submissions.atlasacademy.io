@@ -44,6 +44,15 @@ Expects
 }
 ```
 
+Returns
+```javascript
+{
+  status: "Success",
+  receipt: "Receipt id",
+  missing_drops: "Bool. Indicates if submissions was missing drops (not ignored). Helps app know if refresh of data is required."
+}
+```
+
 ### Event Object
 
 ```javascript
