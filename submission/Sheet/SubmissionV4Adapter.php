@@ -186,8 +186,8 @@ class SubmissionV4Adapter implements AdapterInterface
                 return [
                     "uid" => strtoupper($row[0]),
                     "name" => $name,
-                    "ap" => $row[4],
-                    "sheet_name" => $row[7]
+                    "sheet_name" => $row[7],
+                    "cost" => $row[4]
                 ];
             })
             ->toArray();

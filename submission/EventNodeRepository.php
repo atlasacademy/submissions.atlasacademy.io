@@ -26,7 +26,7 @@ class EventNodeRepository
      */
     public function create(string $eventUid, array $data)
     {
-        $allowedKeys = ["uid", "name", "sheet_name", "submissions", "submitters", "sort", "active"];
+        $allowedKeys = ["uid", "name", "sheet_name", "cost", "submissions", "submitters", "sort", "active"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["event_uid"] = $eventUid;
@@ -89,7 +89,7 @@ class EventNodeRepository
      */
     public function update(string $eventUid, string $uid, array $data)
     {
-        $allowedKeys = ["name", "sheet_name", "submissions", "submitters", "sort", "active"];
+        $allowedKeys = ["name", "sheet_name", "cost", "submissions", "submitters", "sort", "active"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["updated_at"] = Carbon::now();

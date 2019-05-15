@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\AddEventCommand;
 use App\Console\Commands\GenerateTokenCommand;
 use App\Console\Commands\SyncDropsCommand;
+use App\Console\Commands\SyncEventsCommand;
 use App\Console\Commands\TestCommand;
 use App\Console\Commands\UpdateEventCommand;
 use App\Jobs\SyncActiveEventsJob;
@@ -23,6 +24,7 @@ class Kernel extends ConsoleKernel
         AddEventCommand::class,
         GenerateTokenCommand::class,
         SyncDropsCommand::class,
+        SyncEventsCommand::class,
         UpdateEventCommand::class,
         TestCommand::class,
     ];

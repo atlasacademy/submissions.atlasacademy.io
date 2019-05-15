@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 class SheetClient
 {
     private $delay = 2;
-    private $lastRequest = null;
+    private $delayStep = 0;
 
     /**
      * @var Google_Client
@@ -32,7 +32,13 @@ class SheetClient
         try {
             $response = $this->service()->spreadsheets_values->get($sheetId, $range);
         } catch (\Google_Service_Exception $e) {
-            throw new \Exception("SheetClient->getCells({$sheetId}, {$range})", 0, $e);
+            if ($e->getCode() != 429) {
+                throw new \Exception("SheetClient->getCells({$sheetId}, {$range})", 0, $e);
+            }
+
+            $this->delayStep++;
+
+            return $this->getCells($sheetId, $range);
         }
 
         $results = $response->getValues();
@@ -56,7 +62,13 @@ class SheetClient
                 "dateTimeRenderOption" => "SERIAL_NUMBER"
             ]);
         } catch (\Google_Service_Exception $e) {
-            throw new \Exception("SheetClient->getCellsRaw({$sheetId}, {$range})", 0, $e);
+            if ($e->getCode() != 429) {
+                throw new \Exception("SheetClient->getCellsRaw({$sheetId}, {$range})", 0, $e);
+            }
+
+            $this->delayStep++;
+
+            return $this->getCellsRaw($sheetId, $range);
         }
 
         $results = $response->getValues();
@@ -68,12 +80,12 @@ class SheetClient
     {
         $this->throttleRequests();
 
-        $values = $this->formatNullValues($values);
+        $formattedValues = $this->formatNullValues($values);
 
         $requestBody = new Google_Service_Sheets_ValueRange();
         $requestBody->setMajorDimension("ROWS");
         $requestBody->setRange($range);
-        $requestBody->setValues($values);
+        $requestBody->setValues($formattedValues);
         $options = [
             "valueInputOption" => "RAW"
         ];
@@ -81,8 +93,14 @@ class SheetClient
         try {
             $this->service()->spreadsheets_values->update($sheetId, $range, $requestBody, $options);
         } catch (\Google_Service_Exception $e) {
-            $message = "SheetClient->updateCells({$sheetId}, {$range}, " . json_encode($values) . ")";
-            throw new \Exception($message, 0, $e);
+            if ($e->getCode() != 429) {
+                $message = "SheetClient->updateCells({$sheetId}, {$range}, " . json_encode($formattedValues) . ")";
+                throw new \Exception($message, 0, $e);
+            }
+
+            $this->delayStep++;
+
+            return $this->updateCells($sheetId, $range, $values);
         }
 
         return true;
@@ -144,18 +162,11 @@ class SheetClient
 
     private function throttleRequests()
     {
-        $now = microtime(true);
-
-        if (!$this->lastRequest) {
-            sleep($this->delay);
-        } else if ($this->lastRequest + $this->delay > $now) {
-            $elapsed = $now - $this->lastRequest;
-            $sleep = round(($this->delay - $elapsed) * 1000000);
-
-            usleep($sleep);
+        if ($this->delayStep > 6) {
+            throw new \Exception("Throttle step has exceeded limit");
         }
 
-        $this->lastRequest = $now;
+        sleep(pow($this->delay, $this->delayStep));
     }
 
     private function formatNullValues(array $values)
