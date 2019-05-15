@@ -104,6 +104,15 @@ class EventNodeDropRepository
             ->orderBy("uid", "ASC")
             ->get();
 
+        // Mysql Decimal rows are being returned as strings instead of floats.
+        // Manually casting rate and apd fields
+        $results = $results->map(function ($row) {
+            $row->rate = floatval($row->rate);
+            $row->apd = floatval($row->apd);
+
+            return $row;
+        });
+
         return $this->castResultsToArray($results);
     }
 
