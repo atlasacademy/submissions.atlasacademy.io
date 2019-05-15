@@ -8,43 +8,102 @@ outside services and devices.
 
 - GET /event
 - GET /event/{uid}
+- POST /submit/run
 
-### Works in Progress
+### /event
 
-__POST /submit/runs__
-
-Request fields
-```
-event_uid => string
-node_uid => string
-runs => int
-submitter => string | optional
-drops[#][uid] => string
-drops[#][amount] => int
+Returns
+```javascript
+[...events]
 ```
 
-__POST /submit/screenshot__
-
-Request fields
+### /event/{uid}
+Returns
+```javascript
+{
+  ...event,
+  nodes: [...nodes],
+  drops: [...drops],
+  node_drops: [...node_drops]
+}
 ```
-event_uid => string
-node_uid => string
-submitter => string | optional
-image => file | jpg or png
+
+### /submit/run
+Expects
+```javascript
+{
+  event_uid: event.uid,
+  event_node_uid: event.nodes[#].uid,
+  submitter: "",
+  drops: [
+    uid: event.node_drops[#].uid,
+    quantity: event.node_drops[#].quantity,
+    count: Number,
+    ignored: Boolean
+  ]
+}
 ```
 
-### Objects
+Returns
+```javascript
+{
+  status: "Success",
+  receipt: "Receipt id",
+  missing_drops: "Bool. Indicates if submissions was missing drops (not ignored). Helps app know if refresh of data is required."
+}
+```
 
-__Event__
-- uid
-- sheet_id
-- name
-- sort
-- submittable - Only events with this boolean will allow submissions. Otherwise it will return an error.
+### Event Object
 
-__Node__
-- uid
-- name
-- submissions - Number of submitted runs
-- submitters - Number of distinct submitters
-- sort
+```javascript
+{
+  uid: "Unique string identifier",
+  sheet_type: "Internal flag for import/export adapter",
+  sheet_id: "Google sheets id",
+  name: "Event name",
+  node_filter: "Regex to filter out only applicable nodes",
+  submittable: "Bool of if event allows /submit requests"
+}
+```
+
+### Node Object
+
+```javascript
+{
+  event_uid: "Event uid",
+  uid: "Unique string identifier",
+  name: "Node name",
+  sheet_name: "Google sheet tab",
+  submissions: "Number of total submissions",
+  submitters: "Number of unique submitters"
+}
+```
+
+### Drops Object
+
+```javascript
+{
+  uid: "Drop uid",
+  name: "Drop name",
+  type: "Bonus Rate-Up, Material, or QP",
+  quantity: "Some drops have their own embedded quantity. Such as Q050 = 5,000 QP",
+  image: "Url to hosted image",
+  image_original: "Url to original image",
+  event: "Bool of if this drop is event only"
+}
+```
+
+### NodeDrops Object
+
+```javascript
+{
+  event_uid: "Event uid",
+  event_node_uid: "Event Node uid",
+  uid: "Drop uid",
+  quantity: "This quantity field overrides the drops.quantity field if enabled",
+  rate: "Drop rate",
+  apd: "AP per drop",
+  count: "Number of drops recorded",
+  submissions: "Number of submissions recorded"
+}
+```
