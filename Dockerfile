@@ -26,5 +26,8 @@ COPY build/queue.conf /opt/docker/etc/supervisor.d/queue.conf
 # Disable Cron Syslog output
 RUN sed -i "s|not facility(auth, authpriv);|not facility(auth, authpriv, cron);|g" /opt/docker/etc/syslog-ng/syslog-ng.conf
 
+# Enable real ip passthrough from nginx proxy
+COPY ./build/nginx.conf /opt/docker/etc/nginx/vhost.common.d/00-real-ip.conf
+
 COPY --chown=application . /app
 RUN su application -c "composer install --no-dev"
