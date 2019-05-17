@@ -9,6 +9,7 @@ class SheetClient
 {
     private $delay = 2;
     private $delayStep = 0;
+    private $delayableErrorCodes = [429, 503];
 
     /**
      * @var Google_Client
@@ -32,7 +33,7 @@ class SheetClient
         try {
             $response = $this->service()->spreadsheets_values->get($sheetId, $range);
         } catch (\Google_Service_Exception $e) {
-            if ($e->getCode() != 429) {
+            if (!in_array($e->getCode(), $this->delayableErrorCodes)) {
                 throw new \Exception("SheetClient->getCells({$sheetId}, {$range})", 0, $e);
             }
 
@@ -62,7 +63,7 @@ class SheetClient
                 "dateTimeRenderOption" => "SERIAL_NUMBER"
             ]);
         } catch (\Google_Service_Exception $e) {
-            if ($e->getCode() != 429) {
+            if (!in_array($e->getCode(), $this->delayableErrorCodes)) {
                 throw new \Exception("SheetClient->getCellsRaw({$sheetId}, {$range})", 0, $e);
             }
 
@@ -93,7 +94,7 @@ class SheetClient
         try {
             $this->service()->spreadsheets_values->update($sheetId, $range, $requestBody, $options);
         } catch (\Google_Service_Exception $e) {
-            if ($e->getCode() != 429) {
+            if (!in_array($e->getCode(), $this->delayableErrorCodes)) {
                 $message = "SheetClient->updateCells({$sheetId}, {$range}, " . json_encode($formattedValues) . ")";
                 throw new \Exception($message, 0, $e);
             }
