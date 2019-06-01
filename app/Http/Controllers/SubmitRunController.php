@@ -114,7 +114,7 @@ class SubmitRunController extends Controller
             $dropSetting = $this->dropRepository->getDrop($uid);
             $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
 
-            if ($countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
+            if (!is_integer($countRaw) && $countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!is_int($count) && !$ignored) { // Validate either ignored or count is passed
                 throw new HttpException(422, "Either count or ignored must be provided on field drops[{$k}].");
