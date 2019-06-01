@@ -131,6 +131,9 @@ class SheetClient
         $clientSecret = env("GOOGLE_CLIENT_SECRET");
         $clientToken = json_decode(env("GOOGLE_CLIENT_TOKEN"), true);
 
+        if (!$clientId || !$clientSecret || !$clientToken)
+            throw new \Exception("Google Sheet Client failed to initialize. Missing required parameters.");
+
         $client = new Google_Client();
         $client->setApplicationName('Google Sheets API PHP Quickstart');
         $client->setScopes(Google_Service_Sheets::SPREADSHEETS);
