@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
 
 class SubmissionRepository
@@ -60,6 +61,34 @@ class SubmissionRepository
     }
 
     /**
+     * @param string $event_uid
+     * @param string $event_node_uid
+     * @param int $limit
+     * @param string|null $since_receipt
+     * @return array
+     */
+    public function getSubmissions(string $event_uid, string $event_node_uid, int $limit, $since_receipt = null)
+    {
+        $query = $this->connection->table("submissions")
+            ->where("event_uid", "=", $event_uid)
+            ->where("event_node_uid", "=", $event_node_uid)
+            ->orderBy("created_at", "DESC")
+            ->take($limit);
+
+        if ($since_receipt !== null) {
+            $submission = $this->getSubmission($since_receipt);
+            if (!$submission)
+                return [];
+
+            $query->where("created_at", "<", $submission["created_at"]);
+        }
+
+        $results = $query->get();
+
+        return $this->castResultsToArray($results);
+    }
+
+    /**
      * @param string $receipt
      * @param bool $uploaded
      * @return bool
@@ -72,6 +101,15 @@ class SubmissionRepository
                 "uploaded" => boolval($uploaded),
                 "updated_at" => Carbon::now()
             ]);
+    }
+
+    private function castResultsToArray(Collection $results): array
+    {
+        return $results
+            ->map(function ($row) {
+                return (array)$row;
+            })
+            ->toArray();
     }
 
 }

@@ -68,4 +68,9 @@ class EventController extends Controller
         return $this->responseFactory->json($event);
     }
 
+    public function submissions(string $event_uid, string $event_node_uid)
+    {
+        $eventNode = $this->eventNodeRepository->getNode($event_uid, $event_node_uid);
+    }
+
 }

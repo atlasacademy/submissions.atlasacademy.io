@@ -8,13 +8,14 @@ outside services and devices.
 
 - GET /event
 - GET /event/{uid}
+- GET /event/{event_uid}/{event_node_uid}/submissions
 - POST /submit/run
 
 ### /event
 
 Returns
 ```javascript
-[...events]
+[event, ...]
 ```
 
 ### /event/{uid}
@@ -22,10 +23,23 @@ Returns
 ```javascript
 {
   ...event,
-  nodes: [...nodes],
-  drops: [...drops],
-  node_drops: [...node_drops]
+  nodes: [node, ...],
+  drops: [drop, ...],
+  node_drops: [node_drop, ...]
 }
+```
+
+### /event/{event_uid}/{event_node_uid}/submissions
+Expects
+```javascript
+{
+    after_receipt: receipt
+}
+```
+
+Returns
+```javascript
+[submission, ...]
 ```
 
 ### /submit/run
@@ -34,12 +48,15 @@ Expects
 {
   event_uid: event.uid,
   event_node_uid: event.nodes[#].uid,
-  submitter: "",
+  submitter: "Optional",
   drops: [
-    uid: event.node_drops[#].uid,
-    quantity: event.node_drops[#].quantity,
-    count: Number,
-    ignored: Boolean
+    {
+        uid: event.node_drops[#].uid,
+        quantity: event.node_drops[#].quantity,
+        count: Number,
+        ignored: Boolean
+    }
+    ...
   ]
 }
 ```
@@ -105,5 +122,25 @@ Returns
   apd: "AP per drop",
   count: "Number of drops recorded",
   submissions: "Number of submissions recorded"
+}
+```
+
+### Submission Object
+
+```javascript
+{
+  receipt: "Unique receipt id",
+  event_uid: "Event uid",
+  event_node_uid: "Event Node uid",
+  submitter: "Name of submitter",
+  drops: [
+    {
+      uid: "Drop uid",
+      quantity: "Drop quantity. The multiplier for the drop.",
+      count: "Drop count. The value that is submitted by the user.",
+      ignored: "Bool on whether user didn't track drop"
+    },
+    ...
+  ]
 }
 ```

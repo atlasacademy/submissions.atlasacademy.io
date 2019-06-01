@@ -17,5 +17,6 @@
 $router->get('/admin/sync_events', "AdminController@syncEvents");
 $router->get('/event', "EventController@index");
 $router->get('/event/{uid}', "EventController@get");
+$router->get('/event/{event_uid}/{event_node_uid}/submissions', "EventSubmissionsController@get");
 
 $router->post('/submit/run', "SubmitRunController@post");
