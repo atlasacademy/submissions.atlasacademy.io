@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\AddEventCommand;
+use App\Console\Commands\ExportSubmissionCommand;
 use App\Console\Commands\GenerateTokenCommand;
 use App\Console\Commands\SyncDropsCommand;
 use App\Console\Commands\SyncEventsCommand;
@@ -22,6 +23,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         AddEventCommand::class,
+        ExportSubmissionCommand::class,
         GenerateTokenCommand::class,
         SyncDropsCommand::class,
         SyncEventsCommand::class,

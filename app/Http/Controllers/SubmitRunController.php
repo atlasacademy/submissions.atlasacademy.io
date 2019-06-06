@@ -163,8 +163,10 @@ class SubmitRunController extends Controller
             $submitter
         );
 
-        // Queue export job
-        $this->dispatcher->dispatch(new ExportSubmissionJob($receipt));
+        // Only queue job if submitter provided their name. Otherwise, review submission first
+        if (!$submitter) {
+            $this->dispatcher->dispatch(new ExportSubmissionJob($receipt));
+        }
 
         // Generate response
         return $this->responseFactory->json([
