@@ -7,8 +7,8 @@ class ExportSubmissionCommand extends Command
 {
 
 
-    protected $name = "submissions:add_event";
-    protected $description = "Creates a new event and populates data.";
+    protected $name = "submissions:export_submission";
+    protected $description = "Manually calls export submission job.";
 
     /**
      * @var Dispatcher
