@@ -29,7 +29,7 @@ class TestCommand extends Command
 
     public function handle()
     {
-        $this->dispatcher->dispatchNow(new SyncEventJob("20190423"));
+        $this->dispatcher->dispatchNow(new SyncEventJob("20190712"));
     }
 
 }
