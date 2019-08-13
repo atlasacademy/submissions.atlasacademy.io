@@ -89,6 +89,12 @@ class SubmitRunController extends Controller
             throw new HttpException(422, "Submitter name is too long. Maximum 50 characters.");
         }
 
+        // Verify token isn't too long
+        $token = $this->request->get("token", null);
+        if ($token !== null && strlen($token) > 50) {
+            throw new HttpException(422, "Token is too long. Maximum 50 characters.");
+        }
+
         // Ensure drops are passed as an array
         $drops = $this->request->get("drops");
         if (!$drops || !is_array($drops)) {
@@ -156,7 +162,6 @@ class SubmitRunController extends Controller
         }
 
         // Check if submitter already sent in a duplicate submission
-        $token = $this->request->get("token", null);
         $receipt = $this->submissionRepository->getReceiptByToken(
             $event_uid,
             $event_node_uid,
