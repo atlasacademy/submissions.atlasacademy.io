@@ -24,9 +24,10 @@ class SubmissionRepository
      * @param string $eventNodeUid
      * @param array $drops
      * @param string|null $submitter
+     * @param string|null $token
      * @return string
      */
-    public function create(string $eventUid, string $eventNodeUid, array $drops, $submitter = null)
+    public function create(string $eventUid, string $eventNodeUid, array $drops, $submitter = null, $token = null)
     {
         $receipt = Uuid::uuid1()->toString();
 
@@ -38,6 +39,7 @@ class SubmissionRepository
             "drops" => json_encode($drops),
             "uploaded" => false,
             "removed" => false,
+            "token" => $token,
             "created_at" => Carbon::now(),
             "updated_at" => Carbon::now()
         ];
@@ -45,6 +47,21 @@ class SubmissionRepository
         $this->connection->table("submissions")->insert($data);
 
         return $receipt;
+    }
+
+    public function getReceiptByToken(string $event_uid, string $event_node_uid, ?string $submitter, ?string $token): ?string
+    {
+        if ($token === null)
+            return null;
+
+        $submission = $this->connection->table("submissions")
+            ->where("event_uid", "=", $event_uid)
+            ->where("event_node_uid", "=", $event_node_uid)
+            ->where("submitter", "=", $submitter)
+            ->where("token", "=", $token)
+            ->first();
+
+        return $submission ? $submission->token : null;
     }
 
     /**

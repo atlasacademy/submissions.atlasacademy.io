@@ -85,8 +85,8 @@ class SubmitRunController extends Controller
 
         // Verify submitter name isn't too long
         $submitter = $this->request->get("submitter");
-        if ($submitter !== null && strlen($submitter) > 255) {
-            throw new HttpException(422, "Submitter name is too long. Maximum 255 characters.");
+        if ($submitter !== null && strlen($submitter) > 50) {
+            throw new HttpException(422, "Submitter name is too long. Maximum 50 characters.");
         }
 
         // Ensure drops are passed as an array
@@ -155,17 +155,30 @@ class SubmitRunController extends Controller
             }
         }
 
-        // Generate receipt
-        $receipt = $this->submissionRepository->create(
+        // Check if submitter already sent in a duplicate submission
+        $token = $this->request->get("token", null);
+        $receipt = $this->submissionRepository->getReceiptByToken(
             $event_uid,
             $event_node_uid,
-            $cleanDrops,
-            $submitter
+            $submitter,
+            $token
         );
 
-        // Only queue job if submitter provided their name. Otherwise, review submission first
-        if ($submitter) {
-            $this->dispatcher->dispatch(new ExportSubmissionJob($receipt));
+        // If there wasn't a receipt made, make a new submission
+        if (!$receipt) {
+            // Generate receipt
+            $receipt = $this->submissionRepository->create(
+                $event_uid,
+                $event_node_uid,
+                $cleanDrops,
+                $submitter,
+                $token
+            );
+
+            // Only queue job if submitter provided their name. Otherwise, review submission first
+            if ($submitter) {
+                $this->dispatcher->dispatch(new ExportSubmissionJob($receipt));
+            }
         }
 
         // Generate response
