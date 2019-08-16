@@ -106,8 +106,10 @@ class SubmitRunController extends Controller
         $nodeDropUidQuantity = array_map(function ($nodeDrop) {
             return $nodeDrop["uid"] . "_" . $nodeDrop["quantity"];
         }, $nodeDrops);
+        $remainingNodeDropUidQuantity = array_slice($nodeDropUidQuantity, 0);
 
         $cleanDrops = [];
+        $hasUnexpectedDrop = false;
         foreach ($drops as $k => $drop) {
             // Extract drop data
             $uid = strtoupper(Arr::get($drop, "uid"));
@@ -120,20 +122,26 @@ class SubmitRunController extends Controller
             $dropSetting = $this->dropRepository->getDrop($uid);
             $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
 
+            // Check if uid_quantity is expected. Otherwise ignore it. Drop might have been removed from the sheet
+            if (!in_array($uidQuantity, $nodeDropUidQuantity)) {
+                $hasUnexpectedDrop = true;
+                continue;
+            }
+
             if (!is_integer($countRaw) && $countRaw !== null && $countRaw !== strval($count)) { // Validate count is an integer if not null
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!is_int($count) && !$ignored) { // Validate either ignored or count is passed
                 throw new HttpException(422, "Either count or ignored must be provided on field drops[{$k}].");
             } else if ($count < 0 && !$ignored) { // Validate count isn't negative
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
-            } else if (!in_array($uidQuantity, $nodeDropUidQuantity)) { // Validate the same drop + quantity wasn't passed twice
+            } else if (!in_array($uidQuantity, $remainingNodeDropUidQuantity)) { // Validate the same drop + quantity wasn't passed twice
                 throw new HttpException(422, "Duplicate uid and quantity on field drops[{$k}].");
             } else if ($isBonus && ($count > 100 || $count % 10 > 0)) { // Validate bonus type isn't over 100 and bonus is a multiple of 10
                 throw new HttpException(422, "Invalid bonus amount on field drops[{$k}].");
             }
 
             // Remove drop + quantity combination. This is used to check the same drop + quantity wasn't passed twice
-            $nodeDropUidQuantity = array_filter($nodeDropUidQuantity, function ($value) use ($uidQuantity) {
+            $remainingNodeDropUidQuantity = array_filter($remainingNodeDropUidQuantity, function ($value) use ($uidQuantity) {
                 return $value !== $uidQuantity;
             });
 
@@ -148,10 +156,10 @@ class SubmitRunController extends Controller
         }
 
         // Check if user missed any drops that were expected. Report back to user
-        $containsAllExpectedDrops = count($nodeDropUidQuantity) === 0;
+        $hasMissingDrops = count($remainingNodeDropUidQuantity) !== 0;
 
         // Check missed drops to ensure none of them are bonus types
-        foreach ($nodeDropUidQuantity as $uidQuantity) {
+        foreach ($remainingNodeDropUidQuantity as $uidQuantity) {
             list($uid) = explode("_", $uidQuantity);
             $dropSetting = $this->dropRepository->getDrop($uid);
             $isBonus = $dropSetting && $dropSetting["type"] === "Bonus Rate-Up";
@@ -190,7 +198,7 @@ class SubmitRunController extends Controller
         return $this->responseFactory->json([
             "status" => "Success",
             "receipt" => $receipt,
-            "missing_drops" => !$containsAllExpectedDrops
+            "missing_drops" => $hasUnexpectedDrop || $hasMissingDrops,
         ]);
     }
 
