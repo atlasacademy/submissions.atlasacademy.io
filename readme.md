@@ -10,6 +10,7 @@ outside services and devices.
 - GET /event/{uid}
 - GET /event/{event_uid}/{event_node_uid}/submissions
 - POST /submit/run
+- POST /submit/revert
 
 ### /event
 
@@ -49,6 +50,7 @@ Expects
   event_uid: event.uid,
   event_node_uid: event.nodes[#].uid,
   submitter: "Optional",
+  token: "Needs to be set if wanted to revert submission",
   drops: [
     {
         uid: event.node_drops[#].uid,

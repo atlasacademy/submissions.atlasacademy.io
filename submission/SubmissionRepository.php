@@ -110,12 +110,27 @@ class SubmissionRepository
      * @param bool $uploaded
      * @return bool
      */
-    public function setUploaded(string $receipt, bool $uploaded)
+    public function setUploaded(string $receipt, bool $uploaded): bool
     {
         return $this->connection->table("submissions")
             ->where("receipt", "=", $receipt)
             ->update([
                 "uploaded" => boolval($uploaded),
+                "updated_at" => Carbon::now()
+            ]);
+    }
+
+    /**
+     * @param string $receipt
+     * @param bool $removed
+     * @return bool
+     */
+    public function setRemoved(string $receipt, bool $removed): bool
+    {
+        return $this->connection->table("submissions")
+            ->where("receipt", "=", $receipt)
+            ->update([
+                "removed" => boolval($removed),
                 "updated_at" => Carbon::now()
             ]);
     }
