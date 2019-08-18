@@ -56,6 +56,11 @@ class SubmitRevertController extends Controller
             throw new HttpException(422, "Invalid receipt/token.");
         }
 
+        // Only submissions who have a column set can be reverted. If it isn't set, throw error
+        if ($submission['column'] === null) {
+            throw new HttpException(422, "Invalid receipt/token.");
+        }
+
         // Now check if submission has already been reverted. If so, exit gracefully
         if ($submission['removed']) {
             return $this->responseFactory->json([

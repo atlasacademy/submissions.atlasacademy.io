@@ -50,14 +50,16 @@ class ExportSubmissionJob extends Job
         // Add submission
         $this->sheetManager->setSheetType($event["sheet_type"]);
         $this->sheetManager->setSheetId($event["sheet_id"]);
-        $this->sheetManager->addSubmission(
+        $column = $this->sheetManager->addSubmission(
             $submission["event_node_uid"],
             $submission["submitter"],
             json_decode($submission["drops"], true)
         );
 
-        // Set submission as uploaded
-        $this->submissionRepository->setUploaded($this->submissionReceipt, true);
+        if ($column !== null) {
+            $this->submissionRepository->setColumn($this->submissionReceipt, $column);
+            $this->submissionRepository->setUploaded($this->submissionReceipt, true);
+        }
     }
 
 }

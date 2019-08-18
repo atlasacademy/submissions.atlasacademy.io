@@ -72,14 +72,16 @@ class RevertSubmissionJob extends Job
         // Revert submission
         $this->sheetManager->setSheetType($event["sheet_type"]);
         $this->sheetManager->setSheetId($event["sheet_id"]);
-        $this->sheetManager->revertSubmission(
+        $column = $this->sheetManager->revertSubmission(
             $submission["event_node_uid"],
             $submission["submitter"],
+            $submission["column"],
             json_decode($submission["drops"], true)
         );
 
-        // Set submission as removed
-        $this->submissionRepository->setRemoved($this->submissionReceipt, true);
+        if ($column !== null) {
+            $this->submissionRepository->setRemoved($this->submissionReceipt, true);
+        }
     }
 
 }

@@ -53,8 +53,13 @@ class SheetManager implements AdapterInterface
         return $this->sheetAdapter->getNode($uid);
     }
 
-    public function addSubmission(string $nodeUid, $submitter, array $drops)
+    public function addSubmission(string $nodeUid, ?string $submitter, array $drops): ?int
     {
         return $this->sheetAdapter->addSubmission($nodeUid, $submitter, $drops);
+    }
+
+    public function revertSubmission(string $nodeUid, ?string $submitter, int $column, array $drops): ?int
+    {
+        return $this->sheetAdapter->revertSubmission($nodeUid, $submitter, $column, $drops);
     }
 }
