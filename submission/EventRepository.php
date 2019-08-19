@@ -100,6 +100,16 @@ class EventRepository
 
     /**
      * @param string $uid
+     * @param bool $parsable
+     * @return array|null
+     */
+    public function setParsable(string $uid, bool $parsable)
+    {
+        return $this->update($uid, ["parsable" => $parsable]);
+    }
+
+    /**
+     * @param string $uid
      * @param bool $submittable
      * @return array|null
      */
@@ -115,7 +125,7 @@ class EventRepository
      */
     public function update(string $uid, array $data)
     {
-        $allowedKeys = ["name", "sort", "active", "submittable"];
+        $allowedKeys = ["name", "sort", "active", "submittable", "parsable"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["updated_at"] = Carbon::now();

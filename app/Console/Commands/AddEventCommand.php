@@ -37,6 +37,7 @@ class AddEventCommand extends Command
         $name = $this->ask('Input event name');
         $node_filter = $this->ask('Input node filter', null);
         $submittable = $this->choice('Is event submittable?', ['yes', 'no'], 'yes');
+        $parsable = $this->choice('Set event parsable?', ['yes', 'no'], 'no');
         $position = $this->choice('Add event in what position?', ['first', 'last'], 'first');
 
         $this->output->text("Creating event ...");
@@ -54,8 +55,12 @@ class AddEventCommand extends Command
         $this->output->text("Activating event ...");
         $this->eventRepository->setActive($event["uid"], true);
         $this->eventRepository->reorderEvents($event["uid"], $position === "first");
+
         if ($submittable === "yes")
             $this->eventRepository->setSubmittable($event["uid"], true);
+
+        if ($parsable === "yes")
+            $this->eventRepository->setParsable($event["uid"], true);
     }
 
 }
