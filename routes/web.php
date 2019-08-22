@@ -21,3 +21,4 @@ $router->get('/event/{event_uid}/{event_node_uid}/submissions', "EventSubmission
 
 $router->post('/submit/run', "SubmitRunController@post");
 $router->post('/submit/revert', "SubmitRevertController@post");
+$router->post('/submit/screenshot', "SubmitScreenshotController@post");

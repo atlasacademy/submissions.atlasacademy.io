@@ -15,7 +15,9 @@ ENV WEB_DOCUMENT_ROOT=/app/public \
     QUEUE_TABLE=jobs \
     ADMIN_KEY=00000000000000000000000000000000 \
     ASSETS_HOST=http://submissions.test.atlasacademy.io/assets \
-    ASSETS_DIRECTORY=/app/public/assets
+    ASSETS_DIRECTORY=/app/public/assets \
+    SCREENSHOTS_HOST=https://assets.atlasacademy.io/screenshots \
+    SCREENSHOTS_DIRECTORY=/app/storage/screenshots
 
 WORKDIR /app
 

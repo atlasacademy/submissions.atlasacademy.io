@@ -70,14 +70,14 @@ class SubmitRunController extends Controller
     public function post()
     {
         // Verify event is valid and submittable
-        $event_uid = $this->request->get("event_uid");
+        $event_uid = $this->request->get("event_uid", "");
         $event = $this->eventRepository->getEvent($event_uid);
         if (!$event || !$event["active"] || !$event["submittable"]) {
             throw new HttpException(422, "Invalid event uid.");
         }
 
         // Verify node is valid
-        $event_node_uid = $this->request->get("event_node_uid");
+        $event_node_uid = $this->request->get("event_node_uid", "");
         $node = $this->eventNodeRepository->getNode($event_uid, $event_node_uid);
         if (!$node || !$node["active"]) {
             throw new HttpException(422, "Invalid event node uid.");
