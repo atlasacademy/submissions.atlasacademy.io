@@ -14,7 +14,10 @@
 /**
  * @var $router \Laravel\Lumen\Routing\Router
  */
+
 $router->get('/admin/sync_events', "AdminController@syncEvents");
+$router->post('/admin/update_drop_template', "AdminController@updateDropTemplate");
+
 $router->get('/event', "EventController@index");
 $router->get('/event/{uid}', "EventController@get");
 $router->get('/event/{event_uid}/{event_node_uid}/submissions', "EventSubmissionsController@get");
