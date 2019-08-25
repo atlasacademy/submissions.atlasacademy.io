@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\TempFile;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Http\ResponseFactory;
 use Submission\DropRepository;
 use Submission\DropTemplateRepository;
+use Submission\EventNodeDropRepository;
+use Submission\EventNodeRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use ZipArchive;
 
 class ParserController extends Controller
 {
@@ -26,6 +30,14 @@ class ParserController extends Controller
      */
     private $dropTemplateRepository;
     /**
+     * @var EventNodeRepository
+     */
+    private $eventNodeRepository;
+    /**
+     * @var EventNodeDropRepository
+     */
+    private $eventNodeDropRepository;
+    /**
      * @var Request
      */
     private $request;
@@ -37,23 +49,48 @@ class ParserController extends Controller
     public function __construct(Dispatcher $dispatcher,
                                 DropRepository $dropRepository,
                                 DropTemplateRepository $dropTemplateRepository,
+                                EventNodeRepository $eventNodeRepository,
+                                EventNodeDropRepository $eventNodeDropRepository,
                                 Request $request,
                                 ResponseFactory $responseFactory)
     {
         $this->dispatcher = $dispatcher;
         $this->dropRepository = $dropRepository;
         $this->dropTemplateRepository = $dropTemplateRepository;
+        $this->eventNodeRepository = $eventNodeRepository;
+        $this->eventNodeDropRepository = $eventNodeDropRepository;
         $this->request = $request;
         $this->responseFactory = $responseFactory;
     }
 
-    public function updateDropTemplate()
+    public function downloadNodeSettings()
     {
-        $key = $this->request->input("key");
-        if ($key !== env("ADMIN_KEY")) {
-            throw new HttpException(401, "Unauthorized.");
+        $eventUid = $this->request->input("event_uid", "");
+        $eventNodeUid = $this->request->input("event_node_uid", "");
+        $eventNode = $this->eventNodeRepository->getNode($eventUid, $eventNodeUid);
+        if (!$eventNode) {
+            throw new HttpException(422, "Unrecognized event node.");
         }
 
+        $settings = $this->parserAdapter->generateSettings($eventUid, $eventNodeUid);
+        $templates = $this->parserAdapter->generateTemplates($eventUid, $eventNodeUid);
+
+        $path = TempFile::make();
+        $zip = new ZipArchive;
+        $zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip->addFromString("settings.json", $settings);
+
+        foreach ($templates as $templateFilename => $templateBody) {
+            $zip->addFromString("files/{$templateFilename}", base64_decode($templateBody));
+        }
+
+        $zip->close();
+
+        return response()->download($path, "settings.zip");
+    }
+
+    public function updateDropTemplate()
+    {
         $dropUid = $this->request->input("drop_uid", "");
         $drop = $this->dropRepository->getDrop($dropUid);
         if (!$drop) {

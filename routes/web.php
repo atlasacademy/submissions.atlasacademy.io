@@ -19,6 +19,8 @@ $router->group(
     ['middleware' => 'admin', 'namespace' => 'Admin', 'prefix' => 'admin'],
     function () use ($router) {
         $router->get('/sync_events', "CommandController@syncEvents");
+
+        $router->get('/download_parser_node_settings', "ParserController@downloadNodeSettings");
         $router->post('/update_drop_template', "ParserController@updateDropTemplate");
     }
 );

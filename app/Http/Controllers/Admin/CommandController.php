@@ -36,11 +36,6 @@ class CommandController extends Controller
 
     public function syncEvents()
     {
-        $key = $this->request->get("key");
-        if ($key !== env("ADMIN_KEY")) {
-            throw new HttpException(401, "Unauthorized.");
-        }
-
         $this->dispatcher->dispatch(new SyncActiveEventsJob());
 
         return $this->responseFactory->json([
