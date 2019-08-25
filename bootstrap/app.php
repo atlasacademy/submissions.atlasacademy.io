@@ -61,9 +61,10 @@ $app->singleton(
      App\Http\Middleware\CorsMiddleware::class
  ]);
 
-// $app->routeMiddleware([
+ $app->routeMiddleware([
+     'admin' => \App\Http\Middleware\AdminMiddleware::class,
 //     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+ ]);
 
 /*
 |--------------------------------------------------------------------------

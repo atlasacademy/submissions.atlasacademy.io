@@ -15,8 +15,13 @@
  * @var $router \Laravel\Lumen\Routing\Router
  */
 
-$router->get('/admin/sync_events', "AdminController@syncEvents");
-$router->post('/admin/update_drop_template', "AdminController@updateDropTemplate");
+$router->group(
+    ['middleware' => 'admin', 'namespace' => 'Admin', 'prefix' => 'admin'],
+    function () use ($router) {
+        $router->get('/sync_events', "CommandController@syncEvents");
+        $router->post('/update_drop_template', "ParserController@updateDropTemplate");
+    }
+);
 
 $router->get('/event', "EventController@index");
 $router->get('/event/{uid}', "EventController@get");

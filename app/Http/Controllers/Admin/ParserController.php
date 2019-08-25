@@ -1,15 +1,16 @@
-<?php namespace App\Http\Controllers;
+<?php
 
-use App\Jobs\SyncActiveEventsJob;
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Laravel\Lumen\Http\ResponseFactory;
 use Submission\DropRepository;
 use Submission\DropTemplateRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AdminController extends Controller
+class ParserController extends Controller
 {
 
     /**
@@ -44,21 +45,6 @@ class AdminController extends Controller
         $this->dropTemplateRepository = $dropTemplateRepository;
         $this->request = $request;
         $this->responseFactory = $responseFactory;
-    }
-
-    public function syncEvents()
-    {
-        $key = $this->request->get("key");
-        if ($key !== env("ADMIN_KEY")) {
-            throw new HttpException(401, "Unauthorized.");
-        }
-
-        $this->dispatcher->dispatch(new SyncActiveEventsJob());
-
-        return $this->responseFactory->json([
-            "status" => "Success",
-            "message" => "Updating events."
-        ]);
     }
 
     public function updateDropTemplate()
