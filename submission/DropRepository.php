@@ -38,7 +38,7 @@ class DropRepository
         if (!array_key_exists("uid", $data) && !preg_match('/^[A-Za-z0-9]+$/', $data["uid"]))
             throw new \Exception("Invalid UID for drop");
 
-        $allowedKeys = ["uid", "name", "type", "quantity", "image", "image_original", "sort", "event", "active"];
+        $allowedKeys = ["uid", "name", "type", "quantity", "image", "image_original", "sort", "event", "currency", "active"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["created_at"] = Carbon::now();
@@ -175,7 +175,7 @@ class DropRepository
     {
         $oldDrop = $this->getDrop($uid);
 
-        $allowedKeys = ["name", "type", "quantity", "image_original", "sort", "event", "active"];
+        $allowedKeys = ["name", "type", "quantity", "image_original", "sort", "event", "currency", "active"];
         $filteredData = Arr::only($data, $allowedKeys);
 
         $filteredData["updated_at"] = Carbon::now();
