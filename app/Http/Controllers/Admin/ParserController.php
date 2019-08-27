@@ -11,6 +11,7 @@ use Submission\DropRepository;
 use Submission\DropTemplateRepository;
 use Submission\EventNodeDropRepository;
 use Submission\EventNodeRepository;
+use Submission\Parser\ParserAdapter;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use ZipArchive;
 
@@ -38,6 +39,10 @@ class ParserController extends Controller
      */
     private $eventNodeDropRepository;
     /**
+     * @var ParserAdapter
+     */
+    private $parserAdapter;
+    /**
      * @var Request
      */
     private $request;
@@ -51,6 +56,7 @@ class ParserController extends Controller
                                 DropTemplateRepository $dropTemplateRepository,
                                 EventNodeRepository $eventNodeRepository,
                                 EventNodeDropRepository $eventNodeDropRepository,
+                                ParserAdapter $parserAdapter,
                                 Request $request,
                                 ResponseFactory $responseFactory)
     {
@@ -59,6 +65,7 @@ class ParserController extends Controller
         $this->dropTemplateRepository = $dropTemplateRepository;
         $this->eventNodeRepository = $eventNodeRepository;
         $this->eventNodeDropRepository = $eventNodeDropRepository;
+        $this->parserAdapter = $parserAdapter;
         $this->request = $request;
         $this->responseFactory = $responseFactory;
     }
@@ -78,7 +85,7 @@ class ParserController extends Controller
         $path = TempFile::make();
         $zip = new ZipArchive;
         $zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-        $zip->addFromString("settings.json", $settings);
+        $zip->addFromString("settings.json", json_encode($settings));
 
         foreach ($templates as $templateFilename => $templateBody) {
             $zip->addFromString("files/{$templateFilename}", base64_decode($templateBody));
