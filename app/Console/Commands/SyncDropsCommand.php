@@ -99,12 +99,17 @@ class SyncDropsCommand extends Command
                 $uid = $row[0];
                 $name = $row[1];
                 $type = "Material";
-                $currency = $event && preg_match('/[0-9]$/', $uid);
 
                 if (preg_match('/\\[Bonus Rate-up\\]$/', $name))
                     $type = "Bonus Rate-Up";
                 else if ($uid == "QP00" || preg_match('/^Q[0-9]+$/', $uid))
                     $type = "QP";
+                else if ($event && preg_match('/[0-9]$/', $uid))
+                    $type = "Currency";
+                else if ($event && preg_match('/\sCE$/', $name))
+                    $type = "CE";
+                else if ($event)
+                    $type = "Event";
 
                 return [
                     "uid" => $uid,
@@ -113,7 +118,6 @@ class SyncDropsCommand extends Command
                     "quantity" => $row[5] ? $row[5] : null,
                     "image_original" => array_key_exists(6, $row) ? $row[6] : null,
                     "event" => $event,
-                    "currency" => $currency,
                 ];
             });
     }
