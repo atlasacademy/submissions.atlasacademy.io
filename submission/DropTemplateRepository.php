@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class DropTemplateRepository
 {
@@ -19,6 +20,26 @@ class DropTemplateRepository
     public function __construct(DatabaseManager $databaseManager)
     {
         $this->connection = $databaseManager->connection();
+    }
+
+    public function getDropTemplates(string $dropUid, ?int $quantity): array
+    {
+        $results = $this->connection
+            ->table("drop_templates")
+            ->where("drop_uid", "=", $dropUid)
+            ->where("quantity", "=", $quantity)
+            ->orderBy("bonus", "ASC")
+            ->get([
+                // Do not return the image
+                "id",
+                "drop_uid",
+                "quantity",
+                "bonus",
+                "created_at",
+                "updated_at",
+            ]);
+
+        return $this->castResultsToArray($results);
     }
 
     /**
@@ -59,6 +80,15 @@ class DropTemplateRepository
                     "updated_at" => Carbon::now(),
                 ]));
         }
+    }
+
+    private function castResultsToArray(Collection $results): array
+    {
+        return $results
+            ->map(function ($row) {
+                return (array)$row;
+            })
+            ->toArray();
     }
 
 }

@@ -60,7 +60,7 @@ class ParserAdapter
         return $settings;
     }
 
-    private function makeDropTemplatesForNode(string $eventUid, string $eventNodeUid): array
+    public function makeDropTemplatesForNode(string $eventUid, string $eventNodeUid): array
     {
         $dropTemplates = [];
 

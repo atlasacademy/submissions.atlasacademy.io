@@ -79,16 +79,20 @@ class ParserController extends Controller
             throw new HttpException(422, "Unrecognized event node.");
         }
 
+        $dropTemplates = $this->parserAdapter->makeDropTemplatesForNode($eventUid, $eventNodeUid);
         $settings = $this->parserAdapter->generateSettings($eventUid, $eventNodeUid);
-        $templates = $this->parserAdapter->generateTemplates($eventUid, $eventNodeUid);
 
         $path = TempFile::make();
         $zip = new ZipArchive;
         $zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         $zip->addFromString("settings.json", json_encode($settings));
 
-        foreach ($templates as $templateFilename => $templateBody) {
-            $zip->addFromString("files/{$templateFilename}", base64_decode($templateBody));
+        foreach ($dropTemplates as $dropTemplate) {
+            $dropTemplateFile = $this->parserAdapter->generateTemplateFile($dropTemplate);
+            $zip->addFromString(
+                "files/" . $dropTemplateFile["filename"],
+                base64_decode($dropTemplateFile["contents"])
+            );
         }
 
         $zip->close();
