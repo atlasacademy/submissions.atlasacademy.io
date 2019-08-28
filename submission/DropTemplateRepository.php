@@ -22,6 +22,16 @@ class DropTemplateRepository
         $this->connection = $databaseManager->connection();
     }
 
+    public function getDropTemplateImage(int $id): ?string
+    {
+        $result = $this->connection
+            ->table("drop_templates")
+            ->where("id", "=", $id)
+            ->first(["image"]);
+
+        return $result ? $result->image : null;
+    }
+
     public function getDropTemplates(string $dropUid, ?int $quantity): array
     {
         $results = $this->connection

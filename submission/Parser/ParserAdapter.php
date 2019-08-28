@@ -60,6 +60,14 @@ class ParserAdapter
         return $settings;
     }
 
+    public function generateTemplateFile($dropTemplate): array
+    {
+        $filename = $this->makeTemplateName($dropTemplate) . ".png";
+        $contents = $this->dropTemplateRepository->getDropTemplateImage($dropTemplate["id"]);
+
+        return compact("filename", "contents");
+    }
+
     public function makeDropTemplatesForNode(string $eventUid, string $eventNodeUid): array
     {
         $dropTemplates = [];
