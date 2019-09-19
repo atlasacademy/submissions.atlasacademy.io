@@ -136,7 +136,15 @@ class SubmitRunController extends Controller
                 throw new HttpException(422, "Invalid count on field drops[{$k}][count].");
             } else if (!in_array($uidQuantity, $remainingNodeDropUidQuantity)) { // Validate the same drop + quantity wasn't passed twice
                 throw new HttpException(422, "Duplicate uid and quantity on field drops[{$k}].");
-            } else if ($isBonus && ($count > 100 || $count % 10 > 0)) { // Validate bonus type isn't over 100 and bonus is a multiple of 10
+            }
+
+            // CCC
+            // if ($isBonus && ($count > 100 || $count % 10 > 0)) { // Validate bonus type isn't over 100 and bonus is a multiple of 10
+            //     throw new HttpException(422, "Invalid bonus amount on field drops[{$k}].");
+            // }
+
+            // Halloween
+            if ($isBonus && ($count > 100 || $count % 25 > 0)) { // Validate bonus type isn't over 100 and bonus is a multiple of 25
                 throw new HttpException(422, "Invalid bonus amount on field drops[{$k}].");
             }
 
