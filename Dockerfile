@@ -2,6 +2,10 @@ FROM webdevops/php-nginx:7.3
 MAINTAINER sadisticsolutione@gmail.com
 
 ENV WEB_DOCUMENT_ROOT=/app/public \
+    RUN_COMPOSER_INSTALL="false" \
+    RUN_CRON="true" \
+    RUN_MIGRATION="true" \
+    RUN_QUEUE="true" \
     APP_NAME=submissions.atlasacademy.io \
     APP_URL=http://submissions.test.atlasacademy.io \
     DB_CONNECTION=mysql \
