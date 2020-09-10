@@ -23,12 +23,13 @@ class ScreenshotRepository
     /**
      * @param string $eventUid
      * @param string $eventNodeUid
+     * @param string $type
      * @param string $filename
      * @param string $extension
      * @param string|null $submitter
      * @return string
      */
-    public function create(string $eventUid, string $eventNodeUid, string $filename, string $extension, ?string $submitter = null)
+    public function create(string $eventUid, string $eventNodeUid, string $type, string $filename, string $extension, ?string $submitter = null)
     {
         $receipt = Uuid::uuid1()->toString();
 
@@ -36,6 +37,7 @@ class ScreenshotRepository
             "receipt" => $receipt,
             "event_uid" => $eventUid,
             "event_node_uid" => $eventNodeUid,
+            "type" => $type,
             "submitter" => $submitter,
             "filename" => $filename,
             "extension" => $extension,

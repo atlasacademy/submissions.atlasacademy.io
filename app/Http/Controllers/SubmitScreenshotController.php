@@ -59,7 +59,8 @@ class SubmitScreenshotController extends Controller
         $event = $this->getEvent();
         $node = $this->getEventNode($event);
         $submitter = $this->getSubmitter();
-        $screenshots = $this->makeScreenshots($event, $node, $submitter);
+        $type = $this->getType();
+        $screenshots = $this->makeScreenshots($event, $node, $type, $submitter);
 
         $response = [
             "receipts" => []
@@ -115,7 +116,22 @@ class SubmitScreenshotController extends Controller
         return $submitter;
     }
 
-    private function makeScreenshots(array $event, array $node, ?string $submitter): array
+    private function getType(): ?string
+    {
+        $type = $this->request->get("type");
+        if (!$type) {
+            throw new HttpException(422, "Screenshot type is required.");
+        }
+
+        $type = strtolower($type);
+        if (!in_array($type, ['full', 'simple'])) {
+            throw new HttpException(422, "Screenshot type is invalid.");
+        }
+
+        return $type;
+    }
+
+    private function makeScreenshots(array $event, array $node, string $type, ?string $submitter): array
     {
         $allowedExtensions = ["jpg", "jpeg", "png"];
         $allowedMimeTypes = ["image/jpeg", "image/png"];
@@ -152,6 +168,7 @@ class SubmitScreenshotController extends Controller
             $receipt = $this->screenshotRepository->create(
                 $event["uid"],
                 $node["uid"],
+                $type,
                 $filename,
                 $extension,
                 $submitter
