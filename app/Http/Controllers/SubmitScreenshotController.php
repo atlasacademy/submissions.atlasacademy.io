@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ParseScreenshotJob;
+use App\Jobs\ParseSubmissionJob;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Http\ResponseFactory;
@@ -66,7 +66,8 @@ class SubmitScreenshotController extends Controller
         ];
 
         foreach ($screenshots as $screenshot) {
-            $this->parseScreenshot($screenshot);
+            $this->dispatcher->dispatch(new ParseSubmissionJob($screenshot['receipt']));
+
             $response["receipts"][] = [
                 "filename" => $screenshot["filename"],
                 "receipt" => $screenshot["receipt"]
@@ -171,11 +172,6 @@ class SubmitScreenshotController extends Controller
         $extension = array_pop($fileParts);
 
         return $extension ?: null;
-    }
-
-    private function parseScreenshot(array $screenshot): void
-    {
-        $this->dispatcher->dispatch(new ParseScreenshotJob($screenshot["receipt"]));
     }
 
 }

@@ -17,9 +17,15 @@ ENV WEB_DOCUMENT_ROOT=/app/public \
     LOG_CHANNEL=syslog \
     QUEUE_CONNECTION=database \
     QUEUE_TABLE=jobs \
+    S3_ENDPOINT="" \
+    S3_BUCKET="" \
+    S3_KEY="" \
+    S3_SECRET="" \
+    S3_HOST="" \
     ADMIN_KEY=00000000000000000000000000000000 \
     ASSETS_HOST=http://submissions.test.atlasacademy.io/assets \
     ASSETS_DIRECTORY=/app/public/assets \
+    PARSER_HOST=http://parser.test.atlasacademy.io \
     SCREENSHOTS_HOST=https://assets.atlasacademy.io/screenshots \
     SCREENSHOTS_DIRECTORY=/app/storage/screenshots
 

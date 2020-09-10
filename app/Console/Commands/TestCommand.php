@@ -1,6 +1,7 @@
 <?php namespace App\Console\Commands;
 
 use App\Jobs\ExportSubmissionJob;
+use App\Jobs\ParseSubmissionJob;
 use App\Jobs\RevertSubmissionJob;
 use App\Jobs\SyncEventJob;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -30,7 +31,7 @@ class TestCommand extends Command
 
     public function handle()
     {
-        $this->dispatcher->dispatchNow(new RevertSubmissionJob("fe2f7c4c-c18e-11e9-8236-0242ac120005"));
+        $this->dispatcher->dispatchNow(new ParseSubmissionJob("84883404-f321-11ea-878c-0242ac140004"));
     }
 
 }
