@@ -24,6 +24,7 @@ class ParseSubmissionJob extends Job
         $screenshot = $screenshotRepository->getScreenshot($this->receipt);
         $source = $this->uploadScreenshot($screenshot);
         $this->sendToParser($screenshot, $source);
+        $this->deleteScreenshot($screenshot);
     }
 
     private function uploadScreenshot(array $screenshot): string
@@ -80,6 +81,14 @@ class ParseSubmissionJob extends Job
         $client->post('/submit', [
             'json' => $data
         ]);
+    }
+
+    private function deleteScreenshot(array $screenshot)
+    {
+        $directory = env('SCREENSHOTS_DIRECTORY');
+        $filename = "{$screenshot['receipt']}.{$screenshot['extension']}";
+
+        @unlink("{$directory}/{$filename}");
     }
 
 }
