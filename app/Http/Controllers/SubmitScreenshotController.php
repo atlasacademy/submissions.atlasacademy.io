@@ -188,7 +188,7 @@ class SubmitScreenshotController extends Controller
         $fileParts = explode(".", $filename);
         $extension = array_pop($fileParts);
 
-        return $extension ?: null;
+        return $extension === null ? null : strtolower($extension);
     }
 
 }
