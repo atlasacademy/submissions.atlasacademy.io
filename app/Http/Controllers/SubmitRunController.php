@@ -87,6 +87,8 @@ class SubmitRunController extends Controller
         $submitter = $this->request->get("submitter");
         if ($submitter !== null && strlen($submitter) > 50) {
             throw new HttpException(422, "Submitter name is too long. Maximum 50 characters.");
+        } else if (!$submitter) {
+            $submitter = "anon";
         }
 
         // Verify token isn't too long
