@@ -65,20 +65,20 @@ class SyncDropsCommand extends Command
         $bar->finish();
         $this->output->newLine();
 
-        $this->output->text("Deactivating orphaned drops ...");
-        $bar = $this->output->createProgressBar(count($newDrops));
-        $bar->start();
-        foreach ($currentDrops as $currentDrop) {
-            if (in_array($currentDrop["uid"], $newDropUids))
-                continue;
-
-            $this->dropRepository->update($currentDrop["uid"], ["active" => false]);
-            $this->dropRepository->removeImage($currentDrop["uid"]);
-
-            $bar->advance();
-        }
-        $bar->finish();
-        $this->output->newLine();
+//        $this->output->text("Deactivating orphaned drops ...");
+//        $bar = $this->output->createProgressBar(count($newDrops));
+//        $bar->start();
+//        foreach ($currentDrops as $currentDrop) {
+//            if (in_array($currentDrop["uid"], $newDropUids))
+//                continue;
+//
+//            $this->dropRepository->update($currentDrop["uid"], ["active" => false]);
+//            $this->dropRepository->removeImage($currentDrop["uid"]);
+//
+//            $bar->advance();
+//        }
+//        $bar->finish();
+//        $this->output->newLine();
     }
 
 
